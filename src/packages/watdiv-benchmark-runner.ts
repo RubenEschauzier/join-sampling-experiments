@@ -139,3 +139,11 @@ export interface IResultCounts{
     nResults: number,
     nIntermediateResults: number
 }
+
+// Global OOM handler (Node.js only)
+process.on("uncaughtException", (err) => {
+    if (err instanceof RangeError && err.message.includes("allocation")) {
+        console.error("Global Out-of-Memory error detected! Process terminating...");
+        process.exit(1);
+    }
+});

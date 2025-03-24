@@ -6,6 +6,7 @@ const dataset = "/home/reschauz/projects/benchmarks/watdiv-dataset/dataset.nt";
 const queryLocation = "/home/reschauz/projects/benchmarks/watdiv-dataset/queries";
 const runner = new WatDivRunner(dataset, queryLocation);
 const queries = runner.loadWatDivQueries();
+delete queries.C1 
 // profiler.startProfiling("CPU Profile", true);
 runner.run(queries, 10, undefined, undefined, true, "output-sampling.json").then(() => {
 });
