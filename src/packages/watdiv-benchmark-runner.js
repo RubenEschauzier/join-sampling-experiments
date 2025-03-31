@@ -39,18 +39,35 @@ class WatDivRunner {
                     });
                     context[statisticIntermediateResults.key.name] = statisticIntermediateResults;
                 }
-                const start = performance.now();
-                const bs = await this.comunicaRunner.executeQuery(query, context);
-                const startExecution = performance.now();
-                const result = await this.comunicaRunner.consumeStream(bs);
-                console.log(`Results: ${result.length}, intermediate results: ${nIntermediateResults}`);
-                const end = performance.now();
-                measurementsTotal.push(end - start);
-                measurementsRunTime.push(end - startExecution);
-                measurementsNIntermediateResults.push({
-                    nResults: result.length,
-                    nIntermediateResults: nIntermediateResults
-                });
+                try {
+                    const start = performance.now();
+                    const bs = await this.comunicaRunner.executeQuery(query, context);
+                    const startExecution = performance.now();
+                    const result = await this.comunicaRunner.consumeStream(bs);
+                    console.log(`Results: ${result.length}, intermediate results: ${nIntermediateResults}`);
+                    const end = performance.now();
+                    measurementsTotal.push(end - start);
+                    measurementsRunTime.push(end - startExecution);
+                    measurementsNIntermediateResults.push({
+                        nResults: result.length,
+                        nIntermediateResults: nIntermediateResults
+                    });
+                }
+                catch (err) {
+                    console.warn(err);
+                    measurementsTotal.push(0);
+                    measurementsRunTime.push(0);
+                    measurementsNIntermediateResults.push({
+                        nResults: 0,
+                        nIntermediateResults: nIntermediateResults
+                    });
+                }
+                // const start = performance.now();
+                // const bs = await this.comunicaRunner.executeQuery(query, context);
+                // const startExecution = performance.now();
+                // const result = await this.comunicaRunner.consumeStream(bs);
+                // console.log(`Results: ${result.length}, intermediate results: ${nIntermediateResults}`)
+                // const end = performance.now();
             }
             totalExecutionTimes.push(measurementsTotal);
             runTimes.push(measurementsRunTime);
@@ -90,4 +107,11 @@ class WatDivRunner {
     }
 }
 exports.WatDivRunner = WatDivRunner;
+// Global OOM handler (Node.js only)
+process.on("uncaughtException", (err) => {
+    if (err instanceof RangeError && err.message.includes("allocation")) {
+        console.error("Global Out-of-Memory error detected! Process terminating...");
+        process.exit(1);
+    }
+});
 //# sourceMappingURL=watdiv-benchmark-runner.js.map
